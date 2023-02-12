@@ -33,21 +33,21 @@ class Event(models.Model):
 
     UpdatedAt =models.DateField(auto_now=True)
 # controle : donne commmentaire
-organize = models.ForeignKey(Person,on_delete=models.CASCADE)
+    organize = models.ForeignKey(Person,on_delete=models.CASCADE)
 
-participants = models.ManyToManyField(
-    Person,
-    related_name="participations",
-    through="Participation"
-)
+    participants = models.ManyToManyField(
+        Person,
+        related_name="participations",
+        through="Participation"
+    )
 
-def __str__(self):
-    return self.title
+    def __str__(self):
+        return self.title
 
 class Participation(models.Model):
     person =models.ForeignKey(Person,on_delete=models.CASCADE)
     event =models.ForeignKey(Event,on_delete=models.CASCADE)
     datePart =models.DateField(auto_now=True)
-class Meta:
-    unique_Together =('person','event')
-    verbose_name_plural='Participations'
+    class Meta:
+        unique_Together =('person','event')
+        verbose_name_plural='Participations'
