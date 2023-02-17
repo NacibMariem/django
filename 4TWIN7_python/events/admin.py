@@ -1,34 +1,62 @@
 from django.contrib import admin , messages
+from django.utils import timezone
 from .models import Event,Participation 
 # Register your models here.
-class ParticipantFilter(admin.SimpleListFilter):
-    title = 'Participants'
-    parameter_name = 'NombreParticipants'
-    
+###################################### HOMEWORK DATE FILTER ######################################################
+class DatesEventFilter(admin.DateFieldListFilter):
+    title = 'DateEvent'
+    parameter_name = 'DateEvent'
     def lookups(self, request, model_admin):
         return (
-            ('0' ,('No Participants')),
-            ('more' ,('There are Participants'))
+            ('Today', ('Today')),
+            ('This Week', ('This_Week')),
+            ('This Month', ('This_Month')),
+            ('This Year', ('This_Year')),
         )
+
     def queryset(self, request, queryset):
-        if self.value() =='0':
+        today = timezone.now.today()
+        #or simply we can use today = date.today() 
+        if self.value() == 'Today':
+            return queryset.filter(DateEvent__exact=today)
+        elif self.value() == 'This Week':
+            return queryset.filter(DateEvent__week=today.isocalendar()[1])
+        elif self.value() == 'This Month':
+            return queryset.filter(DateEvent__month=today.month)
+        elif self.value() == 'This Year':
+            return queryset.filter(DateEvent__year=today.year)
+        else:
+            return queryset
+###############################################################################################################
+class ParticipantFilter(admin.SimpleListFilter):
+    title = 'Number of Participants'
+    parameter_name = 'NombreParticipants'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('0', ('No Participants')),
+            ('more', ('There are Participants'))
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == '0':
             return queryset.filter(NombreParticipants__exact=0)
-        if self.value() =='more':
+        if self.value() == 'more':
             return queryset.filter(NombreParticipants__gt=0)
-            
-class ParticipationInline(admin.StackedInline): #we can use TabularInline (tableau ) ou stackInline
+
+class ParticipationInline(admin.TabularInline): #we can use TabularInline (tableau ) ou stackInline
         model = Participation
-        extra = 1
+        extra = 1 #  est un paramètre qui définit le nombre de formulaires supplémentaires à afficher 
         classes = ['collapse']
-        can_delete = True
-        readonly_fields = ('datePart',)
+        can_delete = True #champs delete 
+        readonly_fields = ('datePart',) #affiche ken date participation
 
 def set_state(ModelAdmin,request,queryset):
     rows = queryset.update(State= True)
     if(rows ==1):
         msg ="One event was"
     else:
-        msg = f"{rows} events were"
+        msg = f"{rows} events were" #if more than 2 events are selected
     messages.success(request, message='%s successfully accepted' % msg)
 
 set_state.short_description = "Accept" # elle sera afficher fel liste state sinon state sera affiché par defaut
@@ -43,10 +71,10 @@ class EventAdmin(admin.ModelAdmin):
             if(rows==1):
                 msg = "One event was "
             else:
-                msg = f"{rows} events were"
-            messages.success(request, message='%s successfully accepted' % msg)
+                msg = f"{rows} events were" #if more than 2 events are selected 
+            messages.success(request, message='%s successfully refused' % msg)
     unset_state.short_description = "Refuse"
-    actions = [set_state,"unset_state"]
+    actions = [set_state,"unset_state","queryset"]
     actions_on_bottom = True
     actions_on_top = True
     inlines=[
@@ -59,13 +87,17 @@ class EventAdmin(admin.ModelAdmin):
         'Title',
         'Category',
         'State', #liste affiché dans la table evnt
+        'DateEvent'
     )
     list_filter=(
+        
+        ParticipantFilter,
         'Category',
         'State',
-        'NombreParticipants'
+        'DateEvent',
     )
-    ordering = ('Title',)
+    date_hierarchy = 'DateEvent'
+    ordering = ('Title','-DateEvent')
     search_fields=[
         'Title',
         'Category'

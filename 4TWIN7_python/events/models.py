@@ -32,22 +32,26 @@ class Event(models.Model):
     CreatedAt =models.DateField(auto_now_add=True)
 
     UpdatedAt =models.DateField(auto_now=True)
-# controle : donne commmentaire
-    organize = models.ForeignKey(Person,on_delete=models.CASCADE)
+    # controle : donne commmentaire
+    Organizer = models.ForeignKey(Person,on_delete=models.CASCADE)
 
-    participants = models.ManyToManyField(
-        Person,
-        related_name="participations",
-        through="Participation"
+    participants = models.ManyToManyField (
+        Person, #esm l table li m3a l relation
+
+        related_name="participations", #esm l attribut fel event
+
+        through="Participation" #nom de la table intermediaire
     )
 
-    def __str__(self):
-        return self.title
+def __str__(self):
+    return self.title #to string __XX__ : fonction magic ( str to define string ) 
 
 class Participation(models.Model):
-    person =models.ForeignKey(Person,on_delete=models.CASCADE)
-    event =models.ForeignKey(Event,on_delete=models.CASCADE)
-    datePart =models.DateField(auto_now=True)
+    person =models.ForeignKey(Person,on_delete=models.CASCADE) # fk 
+    event =models.ForeignKey(Event,on_delete=models.CASCADE) # fk
+    datePart =models.DateField(auto_now=True) # attribut partagé
+    # les deux id mte3 les deux tables 
     class Meta:
-        unique_Together =('person','event')
-        verbose_name_plural='Participations'
+        unique_together = ('person','event') # une personne ne peut pas participer a pluseirs events a la fois
+        verbose_name_plural='Participations' # pas obligatoire ( ya3ti esm fel cas plural )
+    #class meta : meta donnee 
