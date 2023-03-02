@@ -5,6 +5,8 @@
         <td>Title</td>
         <td>Description</td>
         <td>Image</td>
+        <td>Update </td>
+        <td>Delete</td>
     </tr>
     {% for event in events %}
     <tr>
@@ -13,6 +15,8 @@
             {{event.Title}}</td>
         <td>{{event.Description}}</td>
         <td><img width="70" src="{{event.ImageEvent.url}}" alt=""/></td>
+        <td><a href="{% url 'Event_UpdateEvent' event.id %}">Edit</a></td>
+        <td><a href="{% url 'Event_DeleteEvent_V' event.id %}">Delete</a></td>
     </tr>
     {% endfor %}
 </table>

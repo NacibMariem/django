@@ -1,7 +1,7 @@
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from .models import Event
-from django.views.generic import ListView, DetailView , CreateView
+from django.views.generic import ListView, DetailView , CreateView , UpdateView , DeleteView
 from django.urls import reverse_lazy
 from .models import *
 from .forms import *
@@ -116,8 +116,38 @@ def addEventModel(request):
             'form': form,
         }
     )
+
+def updateEvent(request, id):
+    event = get_object_or_404(Event, id=id)
+    form = EventModelForm(instance=event)
+    
+    if request.method == 'POST':
+        form = EventModelForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            form.save()
+            return redirect('Event_ListEvent_V')
+    
+    return render(
+        request,
+        'events/event_update.html',
+        {
+            'form': form,
+            'event': event,
+        }
+    )
 class EventCreateView(CreateView):
     model = Event
     form_class = EventModelForm
     success_url = reverse_lazy('Event_ListEvent_C')
     template_name ='events/event_add.html'
+
+class EventUpdateView(UpdateView):
+    model = Event
+    form_class = EventModelForm
+    success_url = reverse_lazy('Event_ListEvent_C')
+    template_name = 'events/event_update.html'
+
+class EventDeleteView(DeleteView):
+    model = Event
+    template_name = 'events/event_delete.html'
+    success_url = reverse_lazy('Event_ListEvent_V')
