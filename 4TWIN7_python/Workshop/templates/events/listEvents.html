@@ -1,0 +1,20 @@
+{% extends 'base.html' %} 
+{% block content %}
+<table class="table table-striped mt-5">
+    <tr>
+        <td>Title</td>
+        <td>Description</td>
+        <td>Image</td>
+    </tr>
+    {% for event in events %}
+    <tr>
+        <td>
+            <a href="{% url 'Event_detail' event.id%}">
+            {{event.Title}}</td>
+        <td>{{event.Description}}</td>
+        <td><img width="70" src="{{event.ImageEvent.url}}" alt=""/></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock  %}
+
