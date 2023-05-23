@@ -1,10 +1,12 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Event
 from django.views.generic import ListView, DetailView , CreateView , UpdateView , DeleteView
 from django.urls import reverse_lazy
 from .models import *
 from .forms import *
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 # tjr on a du requetes
 
@@ -48,9 +50,9 @@ def listEventsStatic(request):
         }
     )
 
-
+@login_required(login_url="/users/login")
 def listEvents(request):
-    list = Event.objects.all()  # objects.filter search ...
+    list = Event.objects.filter(State=True)  # objects.filter search ...
     return render(
         request,
         'events/listEvents.html',
@@ -75,6 +77,10 @@ class listEventsViews(ListView):
     model = Event
     template_name = 'events/listEvents.html'
     context_object_name = 'events'
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(State=True)
+    
 
 
 class EventDtails(DetailView):
@@ -116,7 +122,12 @@ def addEventModel(request):
             'form': form,
         }
     )
-
+class EventCreateView(CreateView):
+    model = Event
+    form_class = EventModelForm
+    success_url = reverse_lazy('Event_ListEvent_C')
+    template_name ='events/event_add.html'
+    
 def updateEvent(request, id):
     event = get_object_or_404(Event, id=id)
     form = EventModelForm(instance=event)
@@ -135,11 +146,7 @@ def updateEvent(request, id):
             'event': event,
         }
     )
-class EventCreateView(CreateView):
-    model = Event
-    form_class = EventModelForm
-    success_url = reverse_lazy('Event_ListEvent_C')
-    template_name ='events/event_add.html'
+
 
 class EventUpdateView(UpdateView):
     model = Event
@@ -151,3 +158,20 @@ class EventDeleteView(DeleteView):
     model = Event
     template_name = 'events/event_delete.html'
     success_url = reverse_lazy('Event_ListEvent_V')
+
+def participate(request, id):
+    event = Event.objects.get(id=id)
+    person= Person.objects.get(CIN= 11223344)
+    if Participation.objects.filter(person=person,event=event).count()==0:
+        Participation.objects.create(event=event,person=person)     
+        event.NombreParticipants += 1
+        event.save()
+        messages.add_message(request,messages.SUCCESS,f'your participation to the event : {event.Title} was added ')
+    else:
+        messages.add_message(request, messages.ERROR,"You are already participated to this event")
+    # nb = event.NombreParticipants + 1
+    # Event.objects.filter(id=id).update(NombreParticipants=nb)
+    # ---sol2---
+
+    return redirect('Event_ListEvent_V')
+

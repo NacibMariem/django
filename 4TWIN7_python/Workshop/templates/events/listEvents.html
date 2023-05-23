@@ -5,18 +5,21 @@
         <td>Title</td>
         <td>Description</td>
         <td>Image</td>
+        <td>Nombre Participants </td>
         <td>Update </td>
         <td>Delete</td>
     </tr>
     {% for event in events %}
     <tr>
         <td>
-            <a href="{% url 'Event_detail' event.id%}">
-            {{event.Title}}</td>
+            <a href="{% url 'Event_detail' event.id%}" class="list-group-item list-group-item-light">
+            {{event.Title}}</td></a>
         <td>{{event.Description}}</td>
-        <td><img width="70" src="{{event.ImageEvent.url}}" alt=""/></td>
-        <td><a href="{% url 'Event_UpdateEvent' event.id %}">Edit</a></td>
-        <td><a href="{% url 'Event_DeleteEvent_V' event.id %}">Delete</a></td>
+        <td><img width="100" src="{{event.ImageEvent.url}}" alt=""/></td>
+        <td><center>{{event.NombreParticipants}}</center><br><a href="{% url 'Event_Participate' id=event.id %}" class="btn btn-outline-success">Participate</a></td>
+        
+        <td><a href="{% url 'Event_UpdateEvent' event.id %}" class="btn btn-secondary">Edit</a></td>
+        <td><a href="{% url 'Event_DeleteEvent_V' event.id %}" class="btn btn-danger">Delete</a></td>
     </tr>
     {% endfor %}
 </table>

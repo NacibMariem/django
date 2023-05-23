@@ -12,7 +12,8 @@ urlpatterns = [ #appel tt les url dans
     path('detail/<int:id>',detailEvent,name="Event_detail"),
     path('detailV/<int:pk>',EventDtails.as_view(),name="Event_detailV"),
     path('update/<int:id>', updateEvent, name='Event_UpdateEvent'),
-    path('event/<int:pk>/delete/', EventDeleteView.as_view(), name='Event_DeleteEvent_V'),
+    path('delete/<int:pk>', EventDeleteView.as_view(), name='Event_DeleteEvent_V'),
+    path('participate/<int:id>/', participate, name='Event_Participate'),
 
 
 ]

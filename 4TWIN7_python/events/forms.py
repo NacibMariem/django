@@ -19,6 +19,7 @@ class EventModelForm(forms.ModelForm):
         exclude=['state']
         help_texts={
             'title':'YOUR EVENT TITLE HERE',
+            'Description':'WRITE YOUR DESCRIPTION HERE !'
         }
     DateEvent = forms.DateField(
         initial=date.today,
